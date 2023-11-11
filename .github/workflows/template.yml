@@ -69,7 +69,6 @@ jobs:
         outputs: type=docker,dest=${{ env.DOCKER_IMAGE_PATH }}
         build-args: |
           BUILD_VERSION=${{ env.SEMVER }}
-          DOCKER_BUILDKIT=1
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
