@@ -24,7 +24,6 @@ env:
   DOCKER_USERNAME: ${{ secrets.docker-username }}
   DOCKER_PASSWORD: ${{ secrets.docker-password }}
   DOCKER_IMAGE_PATH: ./build
-  DOCKER_FILE_NAME: ${{ github.repository }}.tar
   ARTIFACT_NAME: docker-image
 jobs:
   determine-version:
@@ -69,7 +68,7 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         file: ./Dockerfile
-        outputs: type=docker,dest=${{ env.DOCKER_IMAGE_PATH }}/${{ env.DOCKER_FILE_NAME}}
+        outputs: type=docker,dest=${{ env.DOCKER_IMAGE_PATH }}/build.tar
         build-args: |
           BUILD_VERSION=${{ env.SEMVER }}
     - name: Upload artifact
@@ -99,7 +98,7 @@ jobs:
           username: ${{ env.DOCKER_USERNAME}}
           password: ${{ env.DOCKER_PASSWORD }}
       - run: |
-          docker load -i ${{ env.DOWNLOAD_PATH }}/${{ env.DOCKER_FILE_NAME}}
+          docker load -i ${{ env.DOWNLOAD_PATH }}/build.tar
           docker push ${{ env.DOCKER_IMAGE_NAME }}
   create-release:
     name: 🚀 create release
