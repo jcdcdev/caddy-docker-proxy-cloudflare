@@ -25,7 +25,7 @@ env:
   DOCKER_PASSWORD: ${{ secrets.docker-password }}
   DOCKER_IMAGE_PATH: ./build
   DOCKER_IMAGE_DEPLOY_PATH: ./deploy
-  ARTIFACT_NAME: ${{ replace( DOCKER_IMAGE_NAME, '/', '_') }}
+  ARTIFACT_NAME: docker-image
 jobs:
   determine-version:
     runs-on: ubuntu-latest
