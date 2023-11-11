@@ -59,6 +59,12 @@ jobs:
           type=raw,value=${{ env.SEMVER }},priority=900 
           type=sha
           type=raw,value=latest  
+    - name: Login to Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ${{ env.DOCKER_REGISTRY }}
+        username: ${{ env.DOCKER_USERNAME}}
+        password: ${{ env.DOCKER_PASSWORD }}
     - name: Build
       id: docker_build
       uses: docker/build-push-action@v2
@@ -67,40 +73,11 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         file: ./Dockerfile
-        load: true
+        push: ${{ inputs.deploy == true }}
         build-args: |
           BUILD_VERSION=${{ env.SEMVER }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
-    - name: Save Docker Image
-      run: docker save ${{ env.DOCKER_IMAGE_NAME }} > image.tar
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ env.ARTIFACT_NAME }}
-        path: image.tar
-  push:
-    name: push ${{ needs.determine-version.outputs.semVer }} to ${{ inputs.registry }}
-    runs-on: ubuntu-latest
-    needs: 
-      - determine-version
-      - build
-    if: ${{ inputs.deploy == true }}
-    steps:
-      - name: Download artifact and push
-        uses: actions/download-artifact@v2
-        with:
-          name: ${{ env.ARTIFACT_NAME }}
-          path: ./download
-      - name: Login to Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ env.DOCKER_REGISTRY }}
-          username: ${{ env.DOCKER_USERNAME}}
-          password: ${{ env.DOCKER_PASSWORD }}
-      - run: |
-          docker load -i ./download/image.tar
-          docker push ${{ env.DOCKER_IMAGE_NAME }}
   create-release:
     name: 🚀 create release
     needs:
