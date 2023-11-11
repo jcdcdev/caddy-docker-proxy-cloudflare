@@ -1,0 +1,44 @@
+name: "Bug report"
+description: "File a bug report to help improve this image."
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this issue as thoroughly as possible.
+  - type: input
+    id: "ImageVersion"
+    attributes:
+      label: "Which version are you using?"
+      description: "Leave blank if you're not sure: the latest version will be assumed."
+    validations:
+      required: false
+  - type: textarea
+    id: "summary"
+    attributes:
+      label: "Bug summary"
+      description: "Write a summary of the bug."
+      placeholder: >
+        Try to pinpoint it as much as possible.
+
+        Try to state the actual problem, and not just what you think the solution might be.
+    validations:
+      required: true
+  - type: textarea
+    id: "reproduction"
+    attributes:
+      label: "Steps to reproduce"
+      description: "How can we reproduce the problem?"
+      placeholder: >
+        Please include any links, screenshots, logs etc.
+    validations:
+      required: true
+  - type: textarea
+    id: "result"
+    attributes:
+      label: "Expected result / actual result"
+      description: "What did you expect that would happen and what is the actual result of the above steps?"
+      placeholder: >
+        Describe the intended/desired outcome after you did the steps mentioned.
+
+        Describe the behaviour of the bug

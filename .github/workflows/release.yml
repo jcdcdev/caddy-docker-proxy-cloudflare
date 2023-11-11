@@ -1,0 +1,16 @@
+name: Release
+on:
+  pull_request:
+    branches: [ "main" ]
+    types: [ closed ]
+  workflow_dispatch:
+jobs:
+  build:
+    permissions:
+      contents: write
+    uses: jcdcdev/caddy-docker-proxy-cloudflare/.github/workflows/template.yml@main
+    with:
+      deploy: true
+    secrets:
+      docker-username: ${{ secrets.DOCKER_HUB_USERNAME }}
+      docker-password: ${{ secrets.DOCKER_HUB_PASSWORD }}
