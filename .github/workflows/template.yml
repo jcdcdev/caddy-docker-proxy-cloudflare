@@ -67,6 +67,7 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         file: ./Dockerfile
+        load: true
         build-args: |
           BUILD_VERSION=${{ env.SEMVER }}
         cache-from: type=gha
