@@ -1,5 +1,7 @@
 ARG CADDY_VERSION=2.7.5
-FROM caddy:${CADDY_VERSION}-builder AS builder
+FROM --platform=$BUILDPLATFORM caddy:${CADDY_VERSION}-builder AS builder
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
 
 RUN xcaddy build \
     --with github.com/lucaslorentz/caddy-docker-proxy/v2 \
