@@ -24,7 +24,7 @@ env:
   DOCKER_USERNAME: ${{ secrets.docker-username }}
   DOCKER_PASSWORD: ${{ secrets.docker-password }}
   DOCKER_IMAGE_PATH: ./build
-  DOCKER_IMAGE_DEPLOY_PATH: ./deploy
+  DOCKER_FILE_NAME: ${{ github.repository }}.tar
   ARTIFACT_NAME: docker-image
 jobs:
   determine-version:
@@ -69,7 +69,7 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         file: ./Dockerfile
-        outputs: type=docker,dest=${{ env.DOCKER_IMAGE_PATH }}
+        outputs: type=docker,dest=${{ env.DOCKER_IMAGE_PATH }}/${{ env.DOCKER_FILE_NAME}}
         build-args: |
           BUILD_VERSION=${{ env.SEMVER }}
     - name: Upload artifact
@@ -84,12 +84,14 @@ jobs:
       - determine-version
       - build
     if: ${{ inputs.deploy == true }}
+    env:
+      DOWNLOAD_PATH: ./download
     steps:
       - name: Download artifact and push
         uses: actions/download-artifact@v2
         with:
           name: ${{ env.ARTIFACT_NAME }}
-          path: ${{ env.DOCKER_IMAGE_DEPLOY_PATH }}
+          path: ${{ env.DOWNLOAD_PATH }}
       - name: Login to Container Registry
         uses: docker/login-action@v1
         with:
@@ -97,12 +99,8 @@ jobs:
           username: ${{ env.DOCKER_USERNAME}}
           password: ${{ env.DOCKER_PASSWORD }}
       - run: |
-          for file in ${{ env.DOCKER_IMAGE_DEPLOY_PATH }}/*.tar; do
-            echo "Loading $file"
-            docker load -i $file
-          done
-          echo "Pushing $DOCKER_IMAGE_NAME"
-          docker push $DOCKER_IMAGE_NAME
+          docker load -i ${{ env.DOWNLOAD_PATH }}/${{ env.DOCKER_FILE_NAME}}
+          docker push ${{ env.DOCKER_IMAGE_NAME }}
   create-release:
     name: 🚀 create release
     needs:
