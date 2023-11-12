@@ -1,0 +1,18 @@
+name: Update Docker Hub Description
+on: 
+    release: 
+        types: [published]
+    workflow_dispatch:
+jobs:
+  dockerHubDescription:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Docker Hub Description
+      uses: peter-evans/dockerhub-description@v3
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+        short-description: ${{ github.event.repository.description }}
+        readme-filepath: .github/README.md

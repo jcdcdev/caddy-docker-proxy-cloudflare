@@ -1,0 +1,6 @@
+version: 1
+update_configs:
+  - package_manager: "docker"
+    directory: "/"
+    update_schedule: "daily"
+    open-pull-requests-limit: 5
