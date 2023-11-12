@@ -1,4 +1,5 @@
 name: Build
+run-name: Build ${{ github.repository }}
 on:
   pull_request:
     branches: "*"
