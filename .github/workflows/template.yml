@@ -76,8 +76,8 @@ jobs:
         push: ${{ inputs.deploy == true }}
         build-args: |
           BUILD_VERSION=${{ env.SEMVER }}
-        # cache-from: type=gha
-        # cache-to: type=gha,mode=max
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
         platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6
   create-release:
     name: 🚀 create release
