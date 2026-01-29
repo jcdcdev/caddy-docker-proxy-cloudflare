@@ -4,7 +4,6 @@
 [![Docker Image Size](https://img.shields.io/docker/image-size/jcdcdev/caddy-docker-proxy-cloudflare/latest)](https://hub.docker.com/r/jcdcdev/caddy-docker-proxy-cloudflare)
 [![GitHub issues](https://img.shields.io/github/issues/jcdcdev/caddy-docker-proxy-cloudflare)](https://github.com/jcdcdev/caddy-docker-proxy-cloudflare/issues)
 [![GitHub last commit](https://img.shields.io/github/last-commit/jcdcdev/caddy-docker-proxy-cloudflare)](https://github.com/jcdcdev/caddy-docker-proxy-cloudflare/commits)
-[![GitHub license](https://img.shields.io/github/license/jcdcdev/caddy-docker-proxy-cloudflare?color=8AB803)](../LICENSE) 
 
 ## Description
 

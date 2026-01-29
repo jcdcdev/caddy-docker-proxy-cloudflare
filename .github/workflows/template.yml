@@ -4,19 +4,19 @@ on:
     inputs:
       deploy:
         type: boolean
-        description: 'Deploy to Docker Registry'
+        description: "Deploy to Docker Registry"
         required: true
       registry:
         type: string
-        description: 'Docker Registry'
+        description: "Docker Registry"
         required: false
-        default: 'docker.io'
+        default: "docker.io"
     secrets:
       docker-username:
-        description: 'Docker Username'
+        description: "Docker Username"
         required: true
       docker-password:
-        description: 'Docker Password'
+        description: "Docker Password"
         required: true
 env:
   DOCKER_REGISTRY: ${{ inputs.registry }}
@@ -27,19 +27,19 @@ env:
 jobs:
   determine-version:
     runs-on: ubuntu-latest
-    outputs: 
+    outputs:
       semVer: ${{ steps.gitversion.outputs.semVer }}
     steps:
-     - uses: actions/checkout@v3
-       with:
-         fetch-depth: 0
-     - name: Install GitVersion
-       uses: gittools/actions/gitversion/setup@v0
-       with:
-         versionSpec: '5.x'
-     - name: Determine Version
-       id: gitversion
-       uses: gittools/actions/gitversion/execute@v0
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0
+        with:
+          versionSpec: "5.x"
+      - name: Determine Version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0
   build:
     runs-on: ubuntu-latest
     needs: determine-version
@@ -47,38 +47,38 @@ jobs:
       SEMVER: ${{ needs.determine-version.outputs.semVer }}
     name: build ${{ needs.determine-version.outputs.semVer }}
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
-    - name: Docker meta
-      id: meta
-      uses: docker/metadata-action@v3
-      with:
-        images: ${{ env.DOCKER_IMAGE_NAME }}
-        tags: |
-          type=raw,value=${{ env.SEMVER }},priority=900 
-          type=sha
-          type=raw,value=latest  
-    - name: Login to Container Registry
-      uses: docker/login-action@v1
-      with:
-        registry: ${{ env.DOCKER_REGISTRY }}
-        username: ${{ env.DOCKER_USERNAME}}
-        password: ${{ env.DOCKER_PASSWORD }}
-    - name: Build
-      id: docker_build
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-        file: ./Dockerfile
-        push: ${{ inputs.deploy == true }}
-        build-args: |
-          BUILD_VERSION=${{ env.SEMVER }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.DOCKER_IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ env.SEMVER }},priority=900 
+            type=sha
+            type=raw,value=latest
+      - name: Login to Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ env.DOCKER_USERNAME}}
+          password: ${{ env.DOCKER_PASSWORD }}
+      - name: Build
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          file: ./Dockerfile
+          push: ${{ inputs.deploy == true }}
+          build-args: |
+            BUILD_VERSION=${{ env.SEMVER }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6
   create-release:
     name: 🚀 create release
     needs:
@@ -91,27 +91,8 @@ jobs:
     env:
       SEMVER: ${{ needs.determine-version.outputs.semVer }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - run: echo "PREVIOUS_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo '')" >> $GITHUB_ENV
-      - name: Generate changelog
-        id: changelog
-        uses: jaywcjlove/changelog-generator@main
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          filter-author: (jcdcdev|dependabot|renovate\\[bot\\]|dependabot\\[bot\\]|Renovate Bot)
-          filter: '(\+semver:\s?(breaking|major|feature|minor|fix|patch)|\+changelog-ignore:.*|Merge.*)'
-          custom-emoji: 'feature🌟'
       - name: Create Release
-        uses: ncipollo/release-action@v1
+        uses: jcdcdev/jcdcdev.GitHub.CreateRelease@v1
         with:
-          allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-          name: ${{ env.SEMVER }}
-          tag: ${{ env.SEMVER }}
-          body: |
-            Compare https://github.com/${{ github.repository }}/compare/${{ env.PREVIOUS_TAG }}...${{env.SEMVER}}
-
-            ${{ steps.changelog.outputs.changelog }}     
+          version: ${{ env.SEMVER }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
