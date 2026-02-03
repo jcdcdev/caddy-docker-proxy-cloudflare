@@ -1,9 +1,12 @@
-ARG CADDY_VERSION=2.11
+ARG CADDY_VERSION=2.8.4
+ARG CADDY_DOCKER_PROXY_VERSION=v2.9.0
+ARG CLOUDFLARE_DNS_VERSION=v0.2.1
+
 FROM caddy:${CADDY_VERSION}-builder AS builder
 
 RUN xcaddy build \
-    --with github.com/lucaslorentz/caddy-docker-proxy/v2 \
-    --with github.com/caddy-dns/cloudflare
+    --with github.com/lucaslorentz/caddy-docker-proxy/v2@${CADDY_DOCKER_PROXY_VERSION} \
+    --with github.com/caddy-dns/cloudflare@${CLOUDFLARE_DNS_VERSION}
 
 FROM caddy:${CADDY_VERSION}-alpine
 

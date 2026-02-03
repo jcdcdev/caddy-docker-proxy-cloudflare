@@ -1,0 +1,38 @@
+name: Check Upstream Caddy Version
+
+on:
+    schedule:
+        - cron: "0 0 * * *"
+    workflow_dispatch:
+
+permissions:
+    contents: write
+    pull-requests: write
+
+jobs:
+    check-version:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                shell: pwsh
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Check for updates
+              id: check
+              run: |
+                  ./scripts/Check-CaddyUpdate.ps1 -Update
+
+            - name: Create Pull Request
+              if: steps.check.outputs.update_available == 'true'
+              uses: peter-evans/create-pull-request@v5
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  commit-message: "chore: bump caddy version to ${{ steps.check.outputs.new_version }}"
+                  title: "Update caddy version to ${{ steps.check.outputs.new_version }}"
+                  body: |
+                      Updates Caddy version from Dockerfile to release ${{ steps.check.outputs.new_version }}.
+                  branch: "update/caddy-${{ steps.check.outputs.new_version }}"
+                  base: main
+                  assignees: jcdcdev
