@@ -33,6 +33,6 @@ jobs:
                   title: "Update caddy version to ${{ steps.check.outputs.new_version }}"
                   body: |
                       Updates Caddy version from Dockerfile to release ${{ steps.check.outputs.new_version }}.
-                  branch: "update/caddy-${{ steps.check.outputs.new_version }}"
+                  branch: "${{ steps.check.outputs.branch_name }}"
                   base: main
                   assignees: jcdcdev
