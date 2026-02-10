@@ -2,14 +2,14 @@ name: Release
 run-name: Release ${{ github.repository }}
 on:
   pull_request:
-    branches: [ "main" ]
-    types: [ closed ]
+    branches: ["main"]
+    types: [closed]
   workflow_dispatch:
 jobs:
   build:
     permissions:
       contents: write
-    uses: jcdcdev/caddy-docker-proxy-cloudflare/.github/workflows/template.yml@main
+    uses: ./.github/workflows/template.yml
     with:
       deploy: true
     secrets:

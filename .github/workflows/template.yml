@@ -11,6 +11,11 @@ on:
         description: "Docker Registry"
         required: false
         default: "docker.io"
+      platforms:
+        type: string
+        description: "Target platforms for multi-arch build (e.g., linux/amd64,linux/arm64)"
+        required: false
+        default: "linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
     secrets:
       docker-username:
         description: "Docker Username"
@@ -30,26 +35,26 @@ jobs:
     outputs:
       semVer: ${{ steps.gitversion.outputs.semVer }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0
+        uses: gittools/actions/gitversion/setup@v4
         with:
-          versionSpec: "5.x"
+          versionSpec: "6.x"
       - name: Determine Version
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v0
+        uses: gittools/actions/gitversion/execute@v4
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubicloud-standard-4
     needs: determine-version
     env:
       SEMVER: ${{ needs.determine-version.outputs.semVer }}
     name: build ${{ needs.determine-version.outputs.semVer }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v3
@@ -60,14 +65,14 @@ jobs:
             type=sha
             type=raw,value=latest
       - name: Login to Container Registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.DOCKER_REGISTRY }}
           username: ${{ env.DOCKER_USERNAME}}
           password: ${{ env.DOCKER_PASSWORD }}
       - name: Build
         id: docker_build
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v6
         with:
           context: .
           tags: ${{ steps.meta.outputs.tags }}
@@ -78,7 +83,7 @@ jobs:
             BUILD_VERSION=${{ env.SEMVER }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6
+          platforms: ${{ inputs.platforms }}
   create-release:
     name: 🚀 create release
     needs:
