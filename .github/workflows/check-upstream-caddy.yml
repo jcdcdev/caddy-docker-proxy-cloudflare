@@ -22,7 +22,7 @@ jobs:
             - name: Check for updates
               id: check
               run: |
-                  ./scripts/Check-CaddyUpdate.ps1 -Update
+                  ./scripts/Check-CaddyUpdate.ps1 -Apply
 
             - name: Create Pull Request
               if: steps.check.outputs.update_available == 'true'
